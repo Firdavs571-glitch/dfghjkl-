@@ -1,0 +1,50 @@
+{
+  "users": {
+    "6836511253": {
+      "status": "approved",
+      "canWatchVideo": true,
+      "blockedVideo": false,
+      "waitingReceipt": false,
+      "videos": [],
+      "freeVideoUsed": true,
+      "paidVideoReady": false
+    },
+    "8707500579": {
+      "status": "rejected",
+      "canWatchVideo": false,
+      "blockedVideo": false,
+      "waitingReceipt": false,
+      "videos": [
+        288
+      ],
+      "isAdmin": true,
+      "freeVideoUsed": true
+    }
+  },
+  "payments": {
+    "pay_1777820529885_6836511253": {
+      "userChatId": "6836511253",
+      "fileId": "AgACAgEAAxkBAAPdafdjdA-c3xqa4fyuReR_V2y3uQYAAmoMaxv8TMBHWcymzxVl6u0BAAMCAANtAAM7BA",
+      "status": "approved",
+      "createdAt": "2026-05-03T15:02:09.885Z"
+    },
+    "pay_1777820945196_8707500579": {
+      "userChatId": "8707500579",
+      "fileId": "AgACAgUAAxkBAAPrafdlBRF37-WjfQ7We2LVMNrgcIkAAtoUaxtZB7hXf4pYdghrh0EBAAMCAANtAAM7BA",
+      "status": "rejected",
+      "createdAt": "2026-05-03T15:09:05.196Z"
+    },
+    "pay_1777821193159_6836511253": {
+      "userChatId": "6836511253",
+      "fileId": "AgACAgEAAxkBAAIBA2n3ZglGzfZel0RCflcQy1DrYBdFAAJrDGsb_EzAR7MrCnLMFxlAAQADAgADbQADOwQ",
+      "status": "approved",
+      "createdAt": "2026-05-03T15:13:13.159Z"
+    },
+    "pay_1777821252579_6836511253": {
+      "userChatId": "6836511253",
+      "fileId": "AgACAgEAAxkBAAIBA2n3ZglGzfZel0RCflcQy1DrYBdFAAJrDGsb_EzAR7MrCnLMFxlAAQADAgADbQADOwQ",
+      "status": "rejected",
+      "createdAt": "2026-05-03T15:14:12.579Z"
+    }
+  }
+}
