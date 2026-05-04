@@ -1,0 +1,16 @@
+{
+  "name": "telegram-bot-nodejs",
+  "version": "1.0.0",
+  "description": "Telegram bot with video protection, payment placeholder, and admin contact",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "stop": "taskkill /IM node.exe /F"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "node-telegram-bot-api": "^0.64.0"
+  }
+}
