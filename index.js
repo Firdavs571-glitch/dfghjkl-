@@ -264,7 +264,7 @@ bot.on("message", async (msg) => {
 
       return bot.sendMessage(
         chatId,
-        `💳 To‘lov kartasi:\n\n${CARD_NUMBER}\n\nTo‘lov qilgach, chek screenshotini rasm qilib yuboring.`
+        `💳 To‘lov kartasi:\n\n${CARD_NUMBER}\n\n 200 ming to‘lov qilgach, chek screenshotini rasm qilib yuboring.`
       );
     }
 
