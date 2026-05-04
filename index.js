@@ -269,7 +269,7 @@ bot.on("message", async (msg) => {
     }
 
     // Admin bilan bog‘lanish
-    if (text === "Adminga bog‘lanish yoki oziz yozing TUIT_SESSIYA111") {
+    if (text === "Adminga bog‘lanish") {
       await bot.sendMessage(
         ADMIN_CHAT_ID,
         `👤 Foydalanuvchi adminga bog‘landi:\n\n` +
@@ -278,7 +278,7 @@ bot.on("message", async (msg) => {
         `Username: @${msg.from.username || "yo‘q"}`
       );
 
-      return bot.sendMessage(chatId, "✅ Adminga xabar yuborildi.yoki oziz yozing  TUIT_SESSIYA111");
+      return bot.sendMessage(chatId, "✅ Adminga xabar yuborildi.\nAdmin: @TUIT_SESSIYA111");
     }
 
     if (text === "🔓 Blokdan ochish" && user.isAdmin) {
