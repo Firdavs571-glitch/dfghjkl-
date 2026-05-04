@@ -269,7 +269,7 @@ bot.on("message", async (msg) => {
     }
 
     // Admin bilan bog‘lanish
-    if (text === "Adminga bog‘lanish") {
+    if (text === "Adminga bog‘lanish yoki o'ziz yozing @TUIT_SESSIYA111") {
       await bot.sendMessage(
         ADMIN_CHAT_ID,
         `👤 Foydalanuvchi adminga bog‘landi:\n\n` +
