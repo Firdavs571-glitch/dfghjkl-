@@ -6,7 +6,7 @@ const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
 
 const ADMIN_CHAT_ID = String(process.env.ADMIN_CHAT_ID);
 const VIDEO_FILE_ID = process.env.VIDEO_FILE_ID;
-const CARD_NUMBER = process.env.CARD_NUMBER || "8600 0000 0000 0000";
+const CARD_NUMBER = process.env.CARD_NUMBER || "9860246602992835";
 
 const DB_FILE = "db.json";
 
