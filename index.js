@@ -278,7 +278,7 @@ bot.on("message", async (msg) => {
         `Username: @${msg.from.username || "yo‘q"}`
       );
 
-      return bot.sendMessage(chatId, "✅ Adminga xabar yuborildi.yoki o'ziz yozing @TUIT_SESSIYA111");
+      return bot.sendMessage(chatId, "✅ Adminga xabar yuborildi.yoki oziz yozing @TUIT_SESSIYA111");
     }
 
     if (text === "🔓 Blokdan ochish" && user.isAdmin) {
