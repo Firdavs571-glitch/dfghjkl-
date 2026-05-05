@@ -62,6 +62,9 @@ function keyboardForUser(user) {
       { text: "🔓 Blokdan ochish" },
       { text: "🚫 Bloklanganlar ro'yxati" }
     ]);
+    buttons.push([
+      { text: "👥 Barcha foydalanuvchilar" }
+    ]);
   }
 
   return {
@@ -301,6 +304,33 @@ bot.on("message", async (msg) => {
         `🚫 <b>Bloklangan foydalanuvchilar:</b>\n\n${listStr}\n\nBlokdan ochish uchun ID ustiga bosib nusxa oling va quyidagicha yuboring:\n/unblock ID`, 
         { parse_mode: "HTML" }
       );
+    }
+
+    if (text === "👥 Barcha foydalanuvchilar" && user.isAdmin) {
+      const allUserIds = Object.keys(db.users);
+      
+      if (allUserIds.length === 0) {
+        return bot.sendMessage(chatId, "✅ Foydalanuvchilar yo'q.");
+      }
+
+      // 4096 character limit in Telegram messages
+      let message = `👥 <b>Barcha foydalanuvchilar (${allUserIds.length} ta):</b>\n\n`;
+      let currentChunk = message;
+      
+      for (const id of allUserIds) {
+        const line = `• <code>${id}</code>\n`;
+        if ((currentChunk.length + line.length) > 4000) {
+          await bot.sendMessage(chatId, currentChunk, { parse_mode: "HTML" });
+          currentChunk = line;
+        } else {
+          currentChunk += line;
+        }
+      }
+      
+      if (currentChunk.trim().length > 0) {
+        return bot.sendMessage(chatId, currentChunk, { parse_mode: "HTML" });
+      }
+      return;
     }
 
   } catch (err) {
