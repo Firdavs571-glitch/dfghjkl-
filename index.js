@@ -313,12 +313,25 @@ bot.on("message", async (msg) => {
         return bot.sendMessage(chatId, "✅ Foydalanuvchilar yo'q.");
       }
 
+      await bot.sendMessage(chatId, "⏳ Foydalanuvchilar ro'yxati yuklanmoqda...");
+
       // 4096 character limit in Telegram messages
       let message = `👥 <b>Barcha foydalanuvchilar (${allUserIds.length} ta):</b>\n\n`;
       let currentChunk = message;
       
       for (const id of allUserIds) {
-        const line = `• <code>${id}</code>\n`;
+        let userInfo = `• <code>${id}</code>`;
+        try {
+          const chatInfo = await bot.getChat(id);
+          const name = [chatInfo.first_name, chatInfo.last_name].filter(Boolean).join(" ");
+          const username = chatInfo.username ? `@${chatInfo.username}` : "";
+          userInfo = `• <a href="tg://user?id=${id}">${name || "Foydalanuvchi"}</a> ${username} (<code>${id}</code>)`;
+        } catch (e) {
+          // Chat topilmasa yoki botni bloklagan bo'lsa
+          userInfo = `• <code>${id}</code>`;
+        }
+
+        const line = `${userInfo}\n`;
         if ((currentChunk.length + line.length) > 4000) {
           await bot.sendMessage(chatId, currentChunk, { parse_mode: "HTML" });
           currentChunk = line;
