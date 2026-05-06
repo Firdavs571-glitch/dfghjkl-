@@ -63,7 +63,8 @@ function keyboardForUser(user) {
       { text: "🚫 Bloklanganlar ro'yxati" }
     ]);
     buttons.push([
-      { text: "👥 Barcha foydalanuvchilar" }
+      { text: "👥 Barcha foydalanuvchilar" },
+      { text: "📢 Hammaga xabar yuborish" }
     ]);
   }
 
@@ -147,8 +148,8 @@ bot.on("message", async (msg) => {
     const db = loadDB();
     const user = getUser(db, chatId);
 
-    // Admin video yuborsa file_id olib beradi
-    if (msg.video && chatId === ADMIN_CHAT_ID) {
+    // Admin video yuborsa file_id olib beradi (faqat broadcast kutilmayotgan bo'lsa)
+    if (msg.video && chatId === ADMIN_CHAT_ID && !user.waitingForBroadcast) {
       return bot.sendMessage(
         chatId,
         `✅ Video file_id olindi:\n\n${msg.video.file_id}\n\n.env faylga shunday yoz:\nVIDEO_FILE_ID=${msg.video.file_id}`
@@ -158,6 +159,41 @@ bot.on("message", async (msg) => {
     // Reject video uploads from non-admin users
     if (msg.video && chatId !== ADMIN_CHAT_ID) {
       return bot.sendMessage(chatId, "❌ Video fayl yuborish ruxsat etilmaydi.");
+    }
+
+    // Agar admin hammaga xabar yubormoqchi bo'lsa
+    if (user.waitingForBroadcast && chatId === ADMIN_CHAT_ID) {
+      if (text === "Bekor qilish") {
+        user.waitingForBroadcast = false;
+        saveDB(db);
+        return bot.sendMessage(chatId, "❌ Xabar yuborish bekor qilindi.", keyboardForUser(user));
+      }
+
+      user.waitingForBroadcast = false;
+      saveDB(db);
+
+      const allUserIds = Object.keys(db.users);
+      let successCount = 0;
+      let failCount = 0;
+
+      await bot.sendMessage(chatId, `⏳ Xabar ${allUserIds.length} ta foydalanuvchiga yuborilmoqda, kuting...`);
+
+      for (const id of allUserIds) {
+        try {
+          await bot.copyMessage(id, chatId, msg.message_id);
+          successCount++;
+        } catch (e) {
+          failCount++;
+        }
+        // Kichik pauza (API limitga tushmaslik uchun)
+        await new Promise(r => setTimeout(r, 50));
+      }
+
+      return bot.sendMessage(
+        chatId,
+        `✅ Xabar yuborildi!\n\nYetib bordi: ${successCount} ta\nYetib bormadi (bloklaganlar): ${failCount} ta`,
+        keyboardForUser(user)
+      );
     }
 
     // Foydalanuvchi chek screenshot yuborsa
@@ -344,6 +380,23 @@ bot.on("message", async (msg) => {
         return bot.sendMessage(chatId, currentChunk, { parse_mode: "HTML" });
       }
       return;
+    }
+
+    if (text === "📢 Hammaga xabar yuborish" && user.isAdmin) {
+      user.waitingForBroadcast = true;
+      saveDB(db);
+
+      return bot.sendMessage(
+        chatId,
+        "📢 Barcha foydalanuvchilarga yubormoqchi bo'lgan xabaringizni yozing yoki rasm/video/fayl yuboring.\n\nBekor qilish uchun <b>Bekor qilish</b> deb yozing.",
+        {
+          parse_mode: "HTML",
+          reply_markup: {
+            keyboard: [[{ text: "Bekor qilish" }]],
+            resize_keyboard: true
+          }
+        }
+      );
     }
 
   } catch (err) {
