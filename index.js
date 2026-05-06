@@ -1,6 +1,15 @@
 require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const fs = require('fs');
+const express = require('express');
+
+// Dummy Express server for Render Web Service compatibility
+const app = express();
+app.get('/', (req, res) => res.send('Bot is running!'));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 
 const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
 
