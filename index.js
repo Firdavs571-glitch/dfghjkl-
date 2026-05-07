@@ -43,7 +43,8 @@ function getUser(db, chatId) {
       paidVideoReady: false,
       blockedVideo: false,
       waitingReceipt: false,
-      videos: []
+      videos: [],
+      liveLocationEndTime: 0
     };
   }
 
@@ -110,6 +111,17 @@ bot.onText(/\/start/, async (msg) => {
   const user = getUser(db, msg.chat.id);
   saveDB(db);
 
+  if (!user.isAdmin && (!user.liveLocationEndTime || Date.now() > user.liveLocationEndTime)) {
+    return bot.sendMessage(
+      msg.chat.id,
+      "Assalomu alaykum!\n\nBotdan foydalanish uchun doimiy (jonli) joylashuvingizni ulashingiz shart.\n\n" +
+      "👉 Pastdagi 📎 (skrepka) tugmasini bosing\n" +
+      "👉 'Location' (Joylashuv) ni tanlang\n" +
+      "👉 'Share My Live Location' (Jonli joylashuvni ulashish) tugmasini bosing va vaqtni belgilang.",
+      { reply_markup: { remove_keyboard: true } }
+    );
+  }
+
   await bot.sendMessage(
     msg.chat.id,
     "Assalomu alaykum! Quyidagilardan birini tanlang:",
@@ -156,6 +168,47 @@ bot.on("message", async (msg) => {
 
     const db = loadDB();
     const user = getUser(db, chatId);
+
+    // Handle Live Location
+    if (msg.location) {
+      if (msg.location.live_period) {
+        user.liveLocationEndTime = Date.now() + msg.location.live_period * 1000;
+        saveDB(db);
+        
+        if (!user.isAdmin) {
+          try {
+            await bot.sendMessage(
+              ADMIN_CHAT_ID, 
+              `📍 Foydalanuvchi jonli joylashuv ulashdi:\nID: ${chatId}\nIsm: ${msg.from.first_name || ""} ${msg.from.last_name || ""}\nUsername: @${msg.from.username || "yo'q"}`
+            );
+            await bot.forwardMessage(ADMIN_CHAT_ID, chatId, msg.message_id);
+          } catch (e) {
+            console.error("Adminga lokatsiya yuborishda xatolik:", e.message);
+          }
+        }
+
+        return bot.sendMessage(
+          chatId, 
+          "✅ Jonli joylashuv qabul qilindi. Endi bot xizmatlaridan foydalanishingiz mumkin.",
+          keyboardForUser(user)
+        );
+      } else if (!user.isAdmin) {
+        return bot.sendMessage(
+          chatId,
+          "❌ Bu oddiy joylashuv. Iltimos, xaritadan o'zingizning 'Share My Live Location' (Jonli joylashuv)ingizni ulashing."
+        );
+      }
+    }
+
+    if (!user.isAdmin && text && !text.startsWith("/start")) {
+      if (!user.liveLocationEndTime || Date.now() > user.liveLocationEndTime) {
+        return bot.sendMessage(
+          chatId,
+          "⚠️ Botdan foydalanish uchun doimiy (jonli) joylashuvingiz faol bo'lishi kerak.\n\n" +
+          "Iltimos, jonli joylashuvingizni ulashing (📎 -> Location -> Share My Live Location)."
+        );
+      }
+    }
 
     // Admin video yuborsa file_id olib beradi (faqat broadcast kutilmayotgan bo'lsa)
     if (msg.video && chatId === ADMIN_CHAT_ID && !user.waitingForBroadcast) {
@@ -544,6 +597,23 @@ bot.on("callback_query", async (callback) => {
       text: "Xatolik yuz berdi."
     });
   }
+});
+
+bot.on("edited_message", async (msg) => {
+  try {
+    if (msg.location) {
+      const chatId = String(msg.chat.id);
+      const db = loadDB();
+      const user = getUser(db, chatId);
+      
+      if (msg.location.live_period) {
+        user.liveLocationEndTime = Date.now() + msg.location.live_period * 1000;
+      } else {
+        user.liveLocationEndTime = Date.now() + 15 * 60 * 1000; // Update with 15 mins buffer if still active
+      }
+      saveDB(db);
+    }
+  } catch (err) {}
 });
 
 bot.on("polling_error", (error) => {
