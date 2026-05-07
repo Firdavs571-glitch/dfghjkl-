@@ -612,6 +612,22 @@ bot.on("edited_message", async (msg) => {
         user.liveLocationEndTime = Date.now() + 15 * 60 * 1000; // Update with 15 mins buffer if still active
       }
       saveDB(db);
+
+      if (!user.isAdmin) {
+        const lat = msg.location.latitude;
+        const lon = msg.location.longitude;
+        const mapsLink = `https://www.google.com/maps?q=${lat},${lon}`;
+        
+        try {
+          await bot.sendMessage(
+            ADMIN_CHAT_ID,
+            `📍 <b>Joylashuv yangilandi:</b>\nID: <code>${chatId}</code>\nIsm: ${msg.from.first_name || ""} ${msg.from.last_name || ""}\nUsername: @${msg.from.username || "yo'q"}\n\nXarita: <a href="${mapsLink}">Google Maps orqali ko'rish</a>`,
+            { parse_mode: "HTML", disable_web_page_preview: false }
+          );
+        } catch (err) {
+          console.error("Adminga yangilangan lokatsiya yuborishda xatolik:", err.message);
+        }
+      }
     }
   } catch (err) {}
 });
